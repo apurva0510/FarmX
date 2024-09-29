@@ -34,7 +34,7 @@ crop_ids = {
 
 # Set page configuration
 st.set_page_config(
-    page_title="fertiCulture",
+    page_title="FarmX",
     page_icon="assets/favicon.png",  # Ensure favicon.png exists
     layout="wide",
     initial_sidebar_state="auto"
@@ -56,7 +56,7 @@ with tabs[0]:
 
     # Introductory Text
     st.markdown(
-        "<h2 style='text-align: center;'>FarmX predicts by how much you can enrich your precious soil, while informing you of its potential bounty.</h2>",
+        "<h2 style='text-align: center;'>Predicts how you can enrich your precious soil, while informing you of its potential bounty.</h2>",
         unsafe_allow_html=True
     )
     st.markdown(
