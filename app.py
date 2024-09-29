@@ -51,36 +51,6 @@ st.title("FarmX")
 # Create Tabs for Navigation
 tabs = st.tabs(["Home", "Projected Yield", "Soil Nitrogen", "Resources", "FAQ"])
 
-st.sidebar.title("Customize Your Experience")
-theme = st.sidebar.selectbox("Choose Theme", ["Default", "Green"])
-
-#Set theme based on user selection
-if theme == "Green":
-    st.markdown(
-        """
-        <style>
-        body {
-            background-color: #18453B;
-            color: black;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-else:
-    st.markdown(
-        """
-        <style>
-        body {
-            background-color: white;
-            color: black;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
-
 ##########################
 # Home Tab
 ##########################
