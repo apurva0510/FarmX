@@ -44,7 +44,36 @@ st.set_page_config(
 st.title("FarmX")
 
 # Create Tabs for Navigation
-tabs = st.tabs(["Home", "Projected Yield", "Soil Nitrogen", "Resources"])
+tabs = st.tabs(["Home", "Projected Yield", "Soil Nitrogen", "Resources", "FAQ"])
+
+st.sidebar.title("Customize Your Experience")
+theme = st.sidebar.selectbox("Choose Theme", ["Default", "Green"])
+
+#Set theme based on user selection
+if theme == "Green":
+    st.markdown(
+        """
+        <style>
+        body {
+            background-color: #18453B;
+            color: black;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+else:
+    st.markdown(
+        """
+        <style>
+        body {
+            background-color: white;
+            color: black;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
 ##########################
 # Home Tab
@@ -147,6 +176,27 @@ with tabs[3]:
     for name, link in resources.items():
         if st.button(name):
             webbrowser.open_new_tab(link)
+
+##########################
+# FAQ Tab
+##########################
+with tabs[4]:
+    st.header("Frequently Asked Questions")
+
+    with st.expander("How to interpret soil nutrient levels?"):
+        st.write("""
+            Soil nutrient levels indicate the availability of essential nutrients like Nitrogen (N), Phosphorus (P), and Potassium (K). Optimal levels ensure healthy crop growth.
+        """)
+
+    with st.expander("When should I apply fertilizers?"):
+        st.write("""
+            Fertilizers should be applied based on soil test results and crop requirements. Typically, application is done during planting and mid-growth stages.
+        """)
+
+    with st.expander("How to use FarmX for best results?"):
+        st.write("""
+            Regularly input your soil test data, monitor nutrient levels, and follow the fertilizer recommendations provided by FarmX to maintain optimal soil health.
+        """)
 
 # Footer
 st.markdown("---")
