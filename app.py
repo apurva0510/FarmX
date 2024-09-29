@@ -1,6 +1,7 @@
 # app.py
 import streamlit as st
 from PIL import Image
+from cost import crop
 import webbrowser
 import functions
 import pandas as pd
