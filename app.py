@@ -2,7 +2,6 @@
 import streamlit as st
 from PIL import Image
 from cost import crop
-import webbrowser
 import functions
 import pandas as pd
 import pickle
@@ -359,10 +358,29 @@ with tabs[3]:
         "How much is too much for the climate?": "https://msutoday.msu.edu/news/2014/how-much-fertilizer-is-too-much-for-the-climate"
     }
 
-    # Display buttons for each resource
+    # Display buttons for each resource using HTML
     for name, link in resources.items():
-        if st.button(name):
-            webbrowser.open_new_tab(link)
+        # Create a button using HTML and CSS
+        button_html = f"""
+            <a href="{link}" target="_blank">
+                <button style="
+                    background-color: #4CAF50; /* Green */
+                    border: none;
+                    color: white;
+                    padding: 10px 24px;
+                    text-align: center;
+                    text-decoration: none;
+                    display: inline-block;
+                    font-size: 16px;
+                    margin: 4px 2px;
+                    cursor: pointer;
+                    border-radius: 8px;
+                ">
+                    {name}
+                </button>
+            </a>
+        """
+        st.markdown(button_html, unsafe_allow_html=True)
 
 ##########################
 # FAQ Tab
@@ -374,7 +392,7 @@ with tabs[4]:
         st.write("""
             Soil nutrient levels indicate the availability of essential nutrients like Nitrogen (N), Phosphorus (P), and Potassium (K). Optimal levels ensure healthy crop growth.
         """)
-
+        
     with st.expander("When should I apply fertilizers?"):
         st.write("""
             Fertilizers should be applied based on soil test results and crop requirements. Typically, application is done during planting and mid-growth stages.
