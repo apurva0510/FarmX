@@ -1,9 +1,11 @@
+# functions.py
 import pandas as pd
 import pickle
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, RandomForestRegressor
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+import streamlit as st
 
 def create_category_columns(df):
     # Define percentiles for categorization
