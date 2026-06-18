@@ -1,11 +1,9 @@
-# app.py
 import streamlit as st
 from PIL import Image
 from cost import crop
 import functions
-import pandas as pd
-import pickle
 import matplotlib.pyplot as plt
+from farmx.crops import CROP_IDS
 
 # Set page configuration
 st.set_page_config(
@@ -15,34 +13,23 @@ st.set_page_config(
     initial_sidebar_state="auto"
 )
 
-# Load model function
-def load_model(filename):
-    with open(filename, 'rb') as f:
-        return pickle.load(f)
-
-# Load all models and scalers at once for efficiency
 @st.cache_resource
-def load_scalers_and_models():
-    scaler_n = load_model('models/scaler_n_category.pkl')
-    gb_classifier = load_model('models/gb_n_category_classifier.pkl')
-    scaler_K = load_model('models/scaler_K_category.pkl')
-    rf_K_classifier = load_model('models/rf_K_category_classifier.pkl')
-    scaler_P = load_model('models/scaler_P_category.pkl')
-    rf_P_classifier = load_model('models/rf_P_category_classifier.pkl')
-    scaler_N = load_model('models/scaler_N.pkl')
-    rf_N_regressor = load_model('models/rf_N_regressor.pkl')
-    return scaler_n, gb_classifier, scaler_K, rf_K_classifier, scaler_P, rf_P_classifier, scaler_N, rf_N_regressor
+def warm_model_cache():
+    """Load committed model artifacts once during Streamlit startup."""
+    for model_file in (
+        "scaler_n_category.pkl",
+        "gb_n_category_classifier.pkl",
+        "scaler_K_category.pkl",
+        "rf_K_category_classifier.pkl",
+        "scaler_P_category.pkl",
+        "rf_P_category_classifier.pkl",
+        "scaler_N.pkl",
+        "rf_N_regressor.pkl",
+    ):
+        functions.load_model(model_file)
 
-scalers_and_models = load_scalers_and_models()
 
-# Define crop IDs for prediction
-crop_ids = {
-    'rice': 1, 'maize': 2, 'chickpea': 3, 'kidneybeans': 4, 'pigeonpeas': 5,
-    'mothbeans': 6, 'mungbean': 7, 'blackgram': 8, 'lentil': 9, 'pomegranate': 10,
-    'banana': 11, 'mango': 12, 'grapes': 13, 'watermelon': 14, 'muskmelon': 15,
-    'apple': 16, 'orange': 17, 'papaya': 18, 'coconut': 19, 'cotton': 20,
-    'jute': 21, 'coffee': 22
-}
+warm_model_cache()
 
 # Application Title
 st.title("FarmX")
@@ -56,7 +43,7 @@ tabs = st.tabs(["Home", "Projected Yield", "Soil Nitrogen", "Resources", "FAQ"])
 with tabs[0]:
     # Display Logo
     logo = Image.open("assets/logo.png")
-    st.image(logo, use_column_width=True)
+    st.image(logo, use_container_width=True)
 
     # Introductory Text
     st.markdown(
@@ -89,12 +76,12 @@ with tabs[1]:
         harvested_area = st.number_input("Harvested Area (ha)", min_value=0.0, step=0.01, format="%.2f")
 
         # Crop Selection for yield prediction
-        crop_selection = st.selectbox("Crop", options=list(crop_ids.keys()), key="crop_yield")
+        crop_selection = st.selectbox("Crop", options=list(CROP_IDS.keys()), key="crop_yield")
 
         # Predict Button
         if st.button("Predict Yield"):
             if all([grain_weight, grain_moisture, harvested_area, crop_selection]):
-                crid = crop_ids.get(crop_selection, None)
+                crid = CROP_IDS.get(crop_selection, None)
                 if crid:
                     try:
                         yield_prediction = crop(grain_weight, grain_moisture, harvested_area, crop_selection)
@@ -113,9 +100,9 @@ with tabs[1]:
             st.markdown("### Crop 1")
             col1, col2 = st.columns(2)
             with col1:
-                crop1 = st.selectbox("Select First Crop", options=list(crop_ids.keys()), key="crop1")
+                crop1 = st.selectbox("Select First Crop", options=list(CROP_IDS.keys()), key="crop1")
             with col2:
-                crid1 = crop_ids.get(crop1, None)
+                crid1 = CROP_IDS.get(crop1, None)
 
             grain_weight1 = st.number_input("Grain Weight (kg) - Crop 1", min_value=0.0, step=0.1, format="%.2f", key="grain_weight1")
             grain_moisture1 = st.number_input("Grain Moisture (%) - Crop 1", min_value=0.0, max_value=100.0, step=0.1, format="%.2f", key="grain_moisture1")
@@ -125,9 +112,9 @@ with tabs[1]:
             st.markdown("### Crop 2")
             col3, col4 = st.columns(2)
             with col3:
-                crop2 = st.selectbox("Select Second Crop", options=list(crop_ids.keys()), key="crop2")
+                crop2 = st.selectbox("Select Second Crop", options=list(CROP_IDS.keys()), key="crop2")
             with col4:
-                crid2 = crop_ids.get(crop2, None)
+                crid2 = CROP_IDS.get(crop2, None)
 
             grain_weight2 = st.number_input("Grain Weight (kg) - Crop 2", min_value=0.0, step=0.1, format="%.2f", key="grain_weight2")
             grain_moisture2 = st.number_input("Grain Moisture (%) - Crop 2", min_value=0.0, max_value=100.0, step=0.1, format="%.2f", key="grain_moisture2")
@@ -156,9 +143,6 @@ with tabs[1]:
                         st.write(f"**Grain Moisture:** {grain_moisture2}%")
                         st.write(f"**Harvested Area:** {harvested_area2} ha")
                         st.write(f"**Projected Yield:** {yield2:.2f} kg")
-
-                    # Optional: Visualization
-                    import matplotlib.pyplot as plt
 
                     fig, ax = plt.subplots()
                     crops = [crop1, crop2]
@@ -195,12 +179,12 @@ with tabs[2]:
         rain = st.number_input("Rainfall (mm)", min_value=0.0, step=0.1, format="%.2f", key="rain_single_n")
 
         # Crop Selection
-        crop_selection_npk = st.selectbox("Crop", options=list(crop_ids.keys()), key="crop_npk_single_n")
+        crop_selection_npk = st.selectbox("Crop", options=list(CROP_IDS.keys()), key="crop_npk_single_n")
 
         # Predict Button
         if st.button("Predict Optimal Nitrogen"):
             if all([temp, hum, pH, rain, crop_selection_npk]):
-                crid = crop_ids.get(crop_selection_npk, None)
+                crid = CROP_IDS.get(crop_selection_npk, None)
                 if crid:
                     try:
                         # Predict categories
@@ -240,9 +224,9 @@ with tabs[2]:
             st.markdown("### Crop 1")
             col1_n, col2_n = st.columns(2)
             with col1_n:
-                crop1_n = st.selectbox("Select First Crop", options=list(crop_ids.keys()), key="crop1_nitrogen")
+                crop1_n = st.selectbox("Select First Crop", options=list(CROP_IDS.keys()), key="crop1_nitrogen")
             with col2_n:
-                crid1_n = crop_ids.get(crop1_n, None)
+                crid1_n = CROP_IDS.get(crop1_n, None)
 
             temp1_n = st.number_input("Temperature (°C) - Crop 1", min_value=-100.0, max_value=100.0, step=0.1, format="%.2f", key="temp1_nitrogen")
             hum1_n = st.number_input("Humidity (%) - Crop 1", min_value=0.0, max_value=100.0, step=0.1, format="%.2f", key="hum1_nitrogen")
@@ -253,9 +237,9 @@ with tabs[2]:
             st.markdown("### Crop 2")
             col3_n, col4_n = st.columns(2)
             with col3_n:
-                crop2_n = st.selectbox("Select Second Crop", options=list(crop_ids.keys()), key="crop2_nitrogen")
+                crop2_n = st.selectbox("Select Second Crop", options=list(CROP_IDS.keys()), key="crop2_nitrogen")
             with col4_n:
-                crid2_n = crop_ids.get(crop2_n, None)
+                crid2_n = CROP_IDS.get(crop2_n, None)
 
             temp2_n = st.number_input("Temperature (°C) - Crop 2", min_value=-100.0, max_value=100.0, step=0.1, format="%.2f", key="temp2_nitrogen")
             hum2_n = st.number_input("Humidity (%) - Crop 2", min_value=0.0, max_value=100.0, step=0.1, format="%.2f", key="hum2_nitrogen")

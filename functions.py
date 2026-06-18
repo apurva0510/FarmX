@@ -1,11 +1,21 @@
 # functions.py
-import pandas as pd
 import pickle
+from functools import lru_cache
+from pathlib import Path
+
+import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, RandomForestRegressor
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
-import streamlit as st
+
+ROOT_DIR = Path(__file__).resolve().parent
+MODEL_DIR = ROOT_DIR / "models"
+
+
+@lru_cache(maxsize=None)
+def load_model(filename):
+    with open(MODEL_DIR / filename, "rb") as file:
+        return pickle.load(file)
 
 def create_category_columns(df):
     # Define percentiles for categorization
@@ -48,13 +58,12 @@ def train_and_save_n_category(df):
     gb_classifier.fit(X_scaled, y)
 
     # Save the model and scaler
-    pickle.dump(gb_classifier, open('models/gb_n_category_classifier.pkl', 'wb'))
-    pickle.dump(scaler, open('models/scaler_n_category.pkl', 'wb'))
+    pickle.dump(gb_classifier, open(MODEL_DIR / 'gb_n_category_classifier.pkl', 'wb'))
+    pickle.dump(scaler, open(MODEL_DIR / 'scaler_n_category.pkl', 'wb'))
 
 def predict_n_category(humidity, temperature, rainfall, ph, id):
-    # Load the model and scaler
-    gb_classifier = pickle.load(open('models/gb_n_category_classifier.pkl', 'rb'))
-    scaler = pickle.load(open('models/scaler_n_category.pkl', 'rb'))
+    gb_classifier = load_model('gb_n_category_classifier.pkl')
+    scaler = load_model('scaler_n_category.pkl')
 
     # Scale the input values
     input_scaled = scaler.transform([[humidity, temperature, rainfall, ph, id]])
@@ -82,13 +91,12 @@ def train_and_save_K_category(df):
     rf_classifier.fit(X_train_scaled, y_train)
 
     # Save the model and scaler
-    pickle.dump(rf_classifier, open('models/rf_K_category_classifier.pkl', 'wb'))
-    pickle.dump(scaler, open('models/scaler_K_category.pkl', 'wb'))
+    pickle.dump(rf_classifier, open(MODEL_DIR / 'rf_K_category_classifier.pkl', 'wb'))
+    pickle.dump(scaler, open(MODEL_DIR / 'scaler_K_category.pkl', 'wb'))
 
 def predict_K_category(humidity, temperature, rainfall, ph, id):
-    # Load the model and scaler
-    rf_classifier = pickle.load(open('models/rf_K_category_classifier.pkl', 'rb'))
-    scaler = pickle.load(open('models/scaler_K_category.pkl', 'rb'))
+    rf_classifier = load_model('rf_K_category_classifier.pkl')
+    scaler = load_model('scaler_K_category.pkl')
 
     # Scale the input values
     input_scaled = scaler.transform([[humidity, temperature, rainfall, ph, id]])
@@ -116,13 +124,12 @@ def train_and_save_P_category(df):
     rf_classifier.fit(X_train_scaled, y_train)
 
     # Save the model and scaler
-    pickle.dump(rf_classifier, open('models/rf_P_category_classifier.pkl', 'wb'))
-    pickle.dump(scaler, open('models/scaler_P_category.pkl', 'wb'))
+    pickle.dump(rf_classifier, open(MODEL_DIR / 'rf_P_category_classifier.pkl', 'wb'))
+    pickle.dump(scaler, open(MODEL_DIR / 'scaler_P_category.pkl', 'wb'))
 
 def predict_P_category(humidity, temperature, rainfall, ph, id):
-    # Load the model and scaler
-    rf_classifier = pickle.load(open('models/rf_P_category_classifier.pkl', 'rb'))
-    scaler = pickle.load(open('models/scaler_P_category.pkl', 'rb'))
+    rf_classifier = load_model('rf_P_category_classifier.pkl')
+    scaler = load_model('scaler_P_category.pkl')
 
     # Scale the input values
     input_scaled = scaler.transform([[humidity, temperature, rainfall, ph, id]])
@@ -150,13 +157,12 @@ def train_and_save_N(df):
     rf_model1.fit(X_train_scaled, y_train)
 
     # Save the model and scaler
-    pickle.dump(rf_model1, open('models/rf_N_regressor.pkl', 'wb'))
-    pickle.dump(scaler, open('models/scaler_N.pkl', 'wb'))
+    pickle.dump(rf_model1, open(MODEL_DIR / 'rf_N_regressor.pkl', 'wb'))
+    pickle.dump(scaler, open(MODEL_DIR / 'scaler_N.pkl', 'wb'))
 
 def predict_N(humidity, temperature, rainfall, ph, pid):
-    # Load the model and scaler
-    rf_model1 = pickle.load(open('models/rf_N_regressor.pkl', 'rb'))
-    scaler = pickle.load(open('models/scaler_N.pkl', 'rb'))
+    rf_model1 = load_model('rf_N_regressor.pkl')
+    scaler = load_model('scaler_N.pkl')
 
     # Scale the input values
     input_scaled = scaler.transform([[humidity, temperature, rainfall, ph, pid]])

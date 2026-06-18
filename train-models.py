@@ -1,4 +1,6 @@
 import pandas as pd
+from pathlib import Path
+
 from functions import (
     create_category_columns,
     train_and_save_n_category,
@@ -7,10 +9,12 @@ from functions import (
     train_and_save_N,
 )
 
+ROOT_DIR = Path(__file__).resolve().parent
+
+
 def main():
-    # Load your dataset
     try:
-        df = pd.read_csv('data/crop_recommendation.csv')  # Update the path as necessary
+        df = pd.read_csv(ROOT_DIR / 'data' / 'crop_recommendation.csv')
     except FileNotFoundError:
         print("Error: The specified file was not found.")
         return
@@ -21,12 +25,6 @@ def main():
         print("Error: The file could not be parsed.")
         return
     
-    # Print DataFrame columns and head for debugging
-    print("DataFrame Columns:", df.columns.tolist())
-    print("DataFrame Head:")
-    print(df.head())
-
-    # Create category columns
     df = create_category_columns(df)
 
     # Check for NaN values in important columns
@@ -43,7 +41,6 @@ def main():
 
     # Proceed to train models
     try:
-        # Call each training function to train and save models
         train_and_save_n_category(df)
         train_and_save_K_category(df)
         train_and_save_P_category(df)
