@@ -28,18 +28,16 @@ The `models/*.pkl` files are intentionally committed because the Streamlit app l
 
 ## Getting Started
 
-Create a virtual environment and install the dependencies:
+Create the locked environment and install its dependencies:
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+uv sync
 ```
 
 Run the app:
 
 ```bash
-streamlit run app.py
+uv run streamlit run app.py
 ```
 
 The app will be available at `http://localhost:8501`.
@@ -49,11 +47,11 @@ The app will be available at `http://localhost:8501`.
 If the dataset or feature engineering changes, regenerate the model artifacts:
 
 ```bash
-python train-models.py
+uv run python train-models.py
 ```
 
 This updates the pickle files in `models/`.
 
 ## Dependency Notes
 
-Dependencies are bounded in `requirements.txt` to keep Dependabot updates manageable while allowing security patches. `requests` and `streamlit` are pinned above the vulnerable ranges reported by Dependabot.
+Dependencies are declared in `pyproject.toml` and reproducibly pinned in `uv.lock`. `requests` and `streamlit` are bounded above the vulnerable ranges reported by Dependabot.
